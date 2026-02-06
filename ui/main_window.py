@@ -207,49 +207,49 @@ class ConversionWorker(QThread):
 
                 self.log.emit(f"Downloaded {len(downloaded_files)} segments", "INFO")
 
-                # Check for pause/stop
-                if self._stopped:
-                    self.finished.emit(False, "Conversion stopped by user")
-                    return
+            # Check for pause/stop
+            if self._stopped:
+                self.finished.emit(False, "Conversion stopped by user")
+                return
 
-                # Convert to MP4
-                self.log.emit("Converting to MP4...", "INFO")
-                self.log.emit(f"Output file: {self.output_path}", "INFO")
-                self.log.emit(f"Number of segments: {len(downloaded_files)}", "INFO")
+            # Convert to MP4 (common for both local and remote)
+            self.log.emit("Converting to MP4...", "INFO")
+            self.log.emit(f"Output file: {self.output_path}", "INFO")
+            self.log.emit(f"Number of segments: {len(downloaded_files)}", "INFO")
 
-                converter = Converter()
+            converter = Converter()
 
-                # Enhanced log callback to also show DEBUG messages
-                def enhanced_log(msg, level):
-                    self.log.emit(msg, level)
-                    # Print to console as well for debugging
-                    print(f"[{level}] {msg}")
+            # Enhanced log callback to also show DEBUG messages
+            def enhanced_log(msg, level):
+                self.log.emit(msg, level)
+                # Print to console as well for debugging
+                print(f"[{level}] {msg}")
 
-                converter.set_callbacks(
-                    progress_callback=lambda curr, total: self.progress.emit(curr, total),
-                    log_callback=enhanced_log
-                )
+            converter.set_callbacks(
+                progress_callback=lambda curr, total: self.progress.emit(curr, total),
+                log_callback=enhanced_log
+            )
 
-                self.log.emit(f"FFmpeg path: {converter.ffmpeg_path}", "INFO")
+            self.log.emit(f"FFmpeg path: {converter.ffmpeg_path}", "INFO")
 
-                success = converter.convert_concat(
-                    downloaded_files,
-                    Path(self.output_path),
-                    delete_segments=False  # Keep segments for debugging
-                )
+            success = converter.convert_concat(
+                downloaded_files,
+                Path(self.output_path),
+                delete_segments=False  # Keep segments for debugging
+            )
 
-                # Verify output file was created
-                output_path = Path(self.output_path)
-                if success and output_path.exists():
-                    file_size_mb = output_path.stat().st_size / (1024*1024)
-                    self.log.emit(f"Conversion completed successfully! File size: {file_size_mb:.2f} MB", "INFO")
-                    self.finished.emit(True, "Conversion completed")
-                elif success and not output_path.exists():
-                    error_msg = f"Conversion reported success but output file not found at: {self.output_path}"
-                    self.log.emit(error_msg, "ERROR")
-                    raise Exception(error_msg)
-                else:
-                    raise Exception("Conversion failed - check logs for details")
+            # Verify output file was created
+            output_path = Path(self.output_path)
+            if success and output_path.exists():
+                file_size_mb = output_path.stat().st_size / (1024*1024)
+                self.log.emit(f"Conversion completed successfully! File size: {file_size_mb:.2f} MB", "INFO")
+                self.finished.emit(True, "Conversion completed")
+            elif success and not output_path.exists():
+                error_msg = f"Conversion reported success but output file not found at: {self.output_path}"
+                self.log.emit(error_msg, "ERROR")
+                raise Exception(error_msg)
+            else:
+                raise Exception("Conversion failed - check logs for details")
 
         except Exception as e:
             self.log.emit(f"Error during conversion: {str(e)}", "ERROR")
