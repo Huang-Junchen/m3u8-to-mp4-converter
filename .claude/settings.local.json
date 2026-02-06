@@ -14,7 +14,8 @@
       "Bash(where:*)",
       "Bash(uv.exe:*)",
       "Bash(tasklist:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(xargs:*)"
     ]
   }
 }

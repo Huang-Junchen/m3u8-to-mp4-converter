@@ -202,13 +202,16 @@ class Converter:
 
             return_code = process.poll()
 
+            # Read any remaining error output
+            error_output = process.stderr.read()
+
             # Clean up list file
             if list_file.exists():
                 list_file.unlink()
 
             if return_code != 0:
-                error_output = process.stderr.read()
-                self._log(f"FFmpeg error: {error_output}", "ERROR")
+                self._log(f"FFmpeg failed with return code: {return_code}", "ERROR")
+                self._log(f"Error output: {error_output}", "ERROR")
                 return False
 
             self._log(f"Conversion completed: {output_file}", "INFO")
@@ -301,13 +304,16 @@ class Converter:
 
             return_code = process.poll()
 
+            # Read any remaining error output
+            error_output = process.stderr.read()
+
             # Clean up list file
             if list_file.exists():
                 list_file.unlink()
 
             if return_code != 0:
-                error_output = process.stderr.read()
-                self._log(f"FFmpeg error: {error_output}", "ERROR")
+                self._log(f"FFmpeg failed with return code: {return_code}", "ERROR")
+                self._log(f"Error output: {error_output}", "ERROR")
                 return False
 
             self._log(f"Conversion completed: {output_file}", "INFO")
