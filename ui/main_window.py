@@ -58,6 +58,109 @@ class ConversionWorker(QThread):
         if self.downloader:
             self.downloader.stop()
 
+    async def _process_local_m3u8(self, m3u8_path: Path):
+        """Process local M3U8 file with decryption support"""
+        import re
+        from Crypto.Cipher import AES
+
+        base_dir = m3u8_path.parent
+
+        # Read M3U8 content
+        with open(m3u8_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Parse encryption info
+        key_path = None
+        iv = None
+
+        lines = content.strip().split('\n')
+        for line in lines:
+            if line.startswith('#EXT-X-KEY:'):
+                if 'METHOD=AES-128' in line:
+                    # Extract URI
+                    uri_match = re.search(r'URI="([^"]+)"', line)
+                    if uri_match:
+                        key_path = base_dir / uri_match.group(1)
+
+                    # Extract IV
+                    iv_match = re.search(r'IV=0x([0-9a-fA-F]+)', line)
+                    if iv_match:
+                        iv = bytes.fromhex(iv_match.group(1))
+                break
+
+        # Read key
+        key = None
+        if key_path and key_path.exists():
+            self.log.emit(f"Reading encryption key...", "INFO")
+            with open(key_path, 'rb') as f:
+                key = f.read()
+            self.log.emit(f"Key size: {len(key)} bytes", "INFO")
+        else:
+            self.log.emit("Warning: Key file not found", "WARNING")
+
+        # Create output directory for segments
+        self.segments_dir.mkdir(parents=True, exist_ok=True)
+
+        # Parse segments and decrypt if needed
+        segments = []
+        segment_index = 0
+        total_segments = sum(1 for line in lines if line.strip() and not line.strip().startswith('#'))
+
+        for line in lines:
+            if self._stopped:
+                raise Exception("Stopped by user")
+
+            line = line.strip()
+
+            # Skip comments and empty lines
+            if not line or line.startswith('#'):
+                continue
+
+            # This is a segment path
+            segment_path = base_dir / line
+
+            if segment_path.exists():
+                # Decrypt if key is available
+                if key:
+                    decrypted_path = self.segments_dir / f"segment_{segment_index:05d}.ts"
+
+                    # Read encrypted data
+                    with open(segment_path, 'rb') as f:
+                        encrypted_data = f.read()
+
+                    # Decrypt
+                    if iv:
+                        cipher = AES.new(key, AES.MODE_CBC, iv)
+                    else:
+                        cipher = AES.new(key, AES.MODE_CBC)
+
+                    decrypted_data = cipher.decrypt(encrypted_data)
+
+                    # Remove PKCS7 padding
+                    try:
+                        padding_length = decrypted_data[-1]
+                        if padding_length <= 16:
+                            decrypted_data = decrypted_data[:-padding_length]
+                    except:
+                        pass  # Invalid padding, skip
+
+                    # Write decrypted data
+                    with open(decrypted_path, 'wb') as f:
+                        f.write(decrypted_data)
+
+                    segments.append(decrypted_path)
+                else:
+                    # Just copy the segment path
+                    segments.append(segment_path)
+
+                segment_index += 1
+                self.progress.emit(segment_index, total_segments)
+
+        encryption_info = {'METHOD': 'AES-128'} if key else None
+        self.log.emit(f"Processed {len(segments)} segments", "INFO")
+
+        return segments, encryption_info
+
     def run(self):
         """Run the conversion process"""
         try:
@@ -71,20 +174,30 @@ class ConversionWorker(QThread):
         try:
             self.log.emit(f"Starting conversion from: {self.url}", "INFO")
 
-            # Create downloader
-            self.downloader = M3U8Downloader(max_workers=10)
-            self.downloader.set_callbacks(
-                progress_callback=lambda curr, total, speed=0: self.progress.emit(curr, total),
-                log_callback=lambda msg, level: self.log.emit(msg, level)
-            )
+            # Check if input is a local file
+            input_path = Path(self.url)
+            is_local_file = input_path.exists() and input_path.suffix.lower() == '.m3u8'
 
-            async with self.downloader:
-                # Download segments
-                self.log.emit("Downloading segments...", "INFO")
-                downloaded_files, encryption_info = await self.downloader.download(
-                    self.url,
-                    self.segments_dir
+            if is_local_file:
+                # Process local file
+                self.log.emit("Detected local M3U8 file", "INFO")
+                downloaded_files, encryption_info = await self._process_local_m3u8(input_path)
+            else:
+                # Process remote URL
+                self.log.emit("Detected remote URL", "INFO")
+                self.downloader = M3U8Downloader(max_workers=10)
+                self.downloader.set_callbacks(
+                    progress_callback=lambda curr, total, speed=0: self.progress.emit(curr, total),
+                    log_callback=lambda msg, level: self.log.emit(msg, level)
                 )
+
+                async with self.downloader:
+                    # Download segments
+                    self.log.emit("Downloading segments...", "INFO")
+                    downloaded_files, encryption_info = await self.downloader.download(
+                        self.url,
+                        self.segments_dir
+                    )
 
                 if not downloaded_files:
                     raise Exception("No segments downloaded")
