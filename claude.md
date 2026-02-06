@@ -45,3 +45,4 @@ pycryptodome  # AES解密
 1. 使用uv和venv来管理python环境
 2. 每次修改进行对应的commit
 3. git提交时注意数据的隐私性和安全性
+4. 修改需求时对应的更改claude.md

@@ -16,9 +16,9 @@ class Converter:
 
     def __init__(self):
         """Initialize the converter"""
-        self.ffmpeg_path = self._find_ffmpeg()
         self._log_callback: Optional[Callable] = None
         self._progress_callback: Optional[Callable] = None
+        self.ffmpeg_path = self._find_ffmpeg()
 
     def set_callbacks(self, progress_callback: Callable = None, log_callback: Callable = None):
         """Set progress and log callbacks"""
@@ -91,6 +91,8 @@ class Converter:
                 [self.ffmpeg_path, "-version"],
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
+                errors='ignore',
                 timeout=10
             )
 
@@ -178,6 +180,8 @@ class Converter:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
+                encoding='utf-8',
+                errors='ignore',
                 bufsize=1,
                 universal_newlines=True
             )
@@ -270,6 +274,8 @@ class Converter:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
+                encoding='utf-8',
+                errors='ignore',
                 bufsize=1,
                 universal_newlines=True
             )
@@ -364,6 +370,8 @@ class Converter:
                 cmd,
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
+                errors='ignore',
                 timeout=10
             )
 
@@ -430,6 +438,8 @@ class Converter:
                 cmd,
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
+                errors='ignore',
                 timeout=3600  # 1 hour timeout
             )
 
