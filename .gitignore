@@ -39,6 +39,8 @@ segments/
 *.mp4
 *.m3u8
 *.ts
+# But keep Qt translation files
+!i18n/*.ts
 logs/
 temp/
 
