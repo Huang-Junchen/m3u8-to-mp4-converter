@@ -531,9 +531,11 @@ class MainWindow(QMainWindow):
             file_path = files[0]
             if file_path.endswith('.m3u8'):
                 self.url_input.setText(file_path)
-                # Auto-set output path
+                # Auto-set output path with simpler filename
                 if not self.output_path.text():
-                    output_file = Path(file_path).with_suffix('.mp4')
+                    import time
+                    timestamp = time.strftime("%Y%m%d_%H%M%S")
+                    output_file = Path(file_path).parent.parent / f"converted_{timestamp}.mp4"
                     self.output_path.setText(str(output_file))
 
     def _browse_m3u8_file(self):
@@ -547,9 +549,11 @@ class MainWindow(QMainWindow):
 
         if file_path:
             self.url_input.setText(file_path)
-            # Auto-set output path
+            # Auto-set output path with simpler filename
             if not self.output_path.text():
-                output_file = Path(file_path).with_suffix('.mp4')
+                import time
+                timestamp = time.strftime("%Y%m%d_%H%M%S")
+                output_file = Path(file_path).parent.parent / f"converted_{timestamp}.mp4"
                 self.output_path.setText(str(output_file))
 
     def _browse_output_file(self):
