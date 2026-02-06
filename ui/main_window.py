@@ -35,7 +35,9 @@ class ConversionWorker(QThread):
         super().__init__()
         self.url = url
         self.output_path = output_path
-        self.segments_dir = Path(output_path).parent / "segments"
+        # Create segments directory in output path's parent directory
+        output_file = Path(output_path)
+        self.segments_dir = output_file.parent / f"{output_file.stem}_segments"
         self._paused = False
         self._stopped = False
         self.downloader = None
@@ -100,6 +102,7 @@ class ConversionWorker(QThread):
 
         # Create output directory for segments
         self.segments_dir.mkdir(parents=True, exist_ok=True)
+        self.log.emit(f"Segments directory: {self.segments_dir}", "INFO")
 
         # Parse segments and decrypt if needed
         segments = []
@@ -211,6 +214,8 @@ class ConversionWorker(QThread):
 
                 # Convert to MP4
                 self.log.emit("Converting to MP4...", "INFO")
+                self.log.emit(f"Output file: {self.output_path}", "INFO")
+                self.log.emit(f"Number of segments: {len(downloaded_files)}", "INFO")
 
                 converter = Converter()
                 converter.set_callbacks(
@@ -221,7 +226,7 @@ class ConversionWorker(QThread):
                 success = converter.convert_concat(
                     downloaded_files,
                     Path(self.output_path),
-                    delete_segments=True
+                    delete_segments=False  # Keep segments for debugging
                 )
 
                 if success:
