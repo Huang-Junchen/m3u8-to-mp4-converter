@@ -274,7 +274,6 @@ class ConverterInterface(ScrollArea):
 
     def _init_ui(self):
         """Initialize the UI"""
-        self.setViewModeEnabled(False)
         self.setObjectName("converterInterface")
         self.setWidgetResizable(True)
 
@@ -778,7 +777,6 @@ class AboutInterface(ScrollArea):
 
     def _init_ui(self):
         """Initialize the UI"""
-        self.setViewModeEnabled(True)
         self.setObjectName("aboutInterface")
         self.setWidgetResizable(True)
 

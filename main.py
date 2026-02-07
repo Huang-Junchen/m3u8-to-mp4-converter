@@ -74,6 +74,10 @@ def check_ffmpeg():
 
 def main():
     """Main entry point"""
+    # Enable high DPI scaling (must be before QApplication creation)
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+
     # Setup asyncio
     setup_asyncio()
 
@@ -93,10 +97,6 @@ def main():
     app.setApplicationName("M3U8 to MP4 Converter")
     app.setOrganizationName("M3U8Converter")
     app.setApplicationVersion("1.0.0")
-
-    # Enable high DPI scaling
-    app.setAttribute(Qt.AA_EnableHighDpiScaling, True)
-    app.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
     # Choose UI mode (Fluent or Classic)
     # Set environment variable USE_FLUENT_UI=false to use classic UI
