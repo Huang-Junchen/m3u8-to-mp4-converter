@@ -18,7 +18,6 @@ from qfluentwidgets import (
     CardWidget, GroupHeaderCardWidget, ScrollArea,
     HyperlinkLabel, ImageLabel, IconWidget
 )
-from qfluentwidgets.components.material import AcrylicLabel
 import asyncio
 from datetime import datetime
 
