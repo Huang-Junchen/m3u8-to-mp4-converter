@@ -13,7 +13,8 @@ import asyncio
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
-from ui.main_window import MainWindow
+from ui.main_window import MainWindow as ClassicMainWindow
+from ui.fluent_main_window import MainWindow as FluentMainWindow
 
 
 def setup_asyncio():
@@ -97,8 +98,19 @@ def main():
     app.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     app.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
-    # Create and show main window
-    window = MainWindow()
+    # Choose UI mode (Fluent or Classic)
+    # Set environment variable USE_FLUENT_UI=false to use classic UI
+    use_fluent = os.environ.get('USE_FLUENT_UI', 'true').lower() == 'true'
+
+    if use_fluent:
+        try:
+            window = FluentMainWindow()
+        except ImportError:
+            print("PyQt-Fluent-Widgets not available, falling back to classic UI...")
+            window = ClassicMainWindow()
+    else:
+        window = ClassicMainWindow()
+
     window.show()
 
     # Run application

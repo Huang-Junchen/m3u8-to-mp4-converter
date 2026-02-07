@@ -15,7 +15,11 @@
       "Bash(uv.exe:*)",
       "Bash(tasklist:*)",
       "Bash(findstr:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "mcp__web-reader__webReader",
+      "mcp__web-search-prime__webSearchPrime",
+      "Bash(.venv\\\\Scripts\\\\python.exe -m pip install:*)",
+      "Bash(\".venv/Scripts/python.exe\" -m pip install \"PyQt-Fluent-Widgets[full]\" -i https://pypi.org/simple/)"
     ]
   }
 }
