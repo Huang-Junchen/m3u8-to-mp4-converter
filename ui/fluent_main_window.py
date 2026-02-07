@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QUrl
 from PyQt5.QtGui import QDragEnterEvent, QDropEvent, QIcon
-from PyQt5.QtWidgets import QApplication, QFileDialog, QVBoxLayout, QHBoxLayout
+from PyQt5.QtWidgets import QApplication, QFileDialog, QVBoxLayout, QHBoxLayout, QWidget
 from qfluentwidgets import (
     FluentWindow, NavigationItemPosition, FluentIcon,
     PushButton, PrimaryPushButton, LineEdit, ProgressBar,
@@ -432,7 +432,6 @@ class ConverterInterface(ScrollArea):
         self.log_text = TextEdit()
         self.log_text.setReadOnly(True)
         self.log_text.setMinimumHeight(200)
-        self.log_text.setFrameVisible(True)
         log_layout.addWidget(self.log_text)
 
         main_layout.addWidget(log_card, 1)  # Give log card stretch factor
@@ -813,10 +812,10 @@ class AboutInterface(ScrollArea):
         self.setWidgetResizable(True)
 
         # Create container widget
-        container = CardWidget()
+        container = QWidget()
         layout = QVBoxLayout(container)
-        layout.setSpacing(20)
-        layout.setContentsMargins(40, 40, 40, 40)
+        layout.setSpacing(15)
+        layout.setContentsMargins(30, 30, 30, 30)
 
         # Title
         title = SubtitleLabel("M3U8 to MP4 Converter")
@@ -829,7 +828,11 @@ class AboutInterface(ScrollArea):
         layout.addWidget(version)
 
         # Description
-        desc_layout = QVBoxLayout()
+        desc_card = CardWidget()
+        desc_layout = QVBoxLayout(desc_card)
+        desc_layout.setContentsMargins(20, 20, 20, 20)
+        desc_layout.setSpacing(10)
+
         desc = BodyLabel(
             "A desktop application for converting M3U8 video streams to MP4 format.\n\n"
             "Features:\n"
@@ -842,16 +845,23 @@ class AboutInterface(ScrollArea):
         )
         desc.setWordWrap(True)
         desc_layout.addWidget(desc)
-        layout.addLayout(desc_layout)
+
+        layout.addWidget(desc_card)
 
         # GitHub link
-        link_layout = QHBoxLayout()
-        link_layout.addStretch()
+        link_card = CardWidget()
+        link_layout = QVBoxLayout(link_card)
+        link_layout.setContentsMargins(20, 15, 20, 15)
+
+        link_row = QHBoxLayout()
+        link_row.addStretch()
         github_link = HyperlinkLabel("https://github.com/zhiyiYo/PyQt-Fluent-Widgets", self)
         github_link.setText("UI Library: PyQt-Fluent-Widgets")
-        link_layout.addWidget(github_link)
-        link_layout.addStretch()
-        layout.addLayout(link_layout)
+        link_row.addWidget(github_link)
+        link_row.addStretch()
+
+        link_layout.addLayout(link_row)
+        layout.addWidget(link_card)
 
         layout.addStretch()
 
