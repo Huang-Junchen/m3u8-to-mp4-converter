@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QUrl
 from PyQt5.QtGui import QDragEnterEvent, QDropEvent
-from PyQt5.QtWidgets import QApplication, QFileDialog
+from PyQt5.QtWidgets import QApplication, QFileDialog, QVBoxLayout, QHBoxLayout
 from qfluentwidgets import (
     FluentWindow, NavigationItemPosition, FluentIcon,
     PushButton, PrimaryPushButton, LineEdit, ProgressBar,
