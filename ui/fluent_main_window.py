@@ -1,22 +1,21 @@
 """
 Fluent Design Main Window UI for M3U8 to MP4 Converter
 Using PyQt-Fluent-Widgets library
+Based on PyQt-Fluent-Widgets examples best practices
 """
 
 import sys
 import os
 from pathlib import Path
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QUrl
-from PyQt5.QtGui import QDragEnterEvent, QDropEvent, QIcon
-from PyQt5.QtWidgets import QApplication, QFileDialog, QVBoxLayout, QHBoxLayout, QWidget
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtGui import QDragEnterEvent, QDropEvent
+from PyQt5.QtWidgets import QApplication, QFileDialog, QWidget, QVBoxLayout, QHBoxLayout, QLabel
 from qfluentwidgets import (
-    FluentWindow, NavigationItemPosition, FluentIcon,
+    FluentWindow, NavigationItemPosition, FluentIcon as FIF,
     PushButton, PrimaryPushButton, LineEdit, ProgressBar,
     TextEdit, SubtitleLabel, StrongBodyLabel, BodyLabel,
     InfoBar, InfoBarPosition, setTheme, Theme,
-    MessageBox, FolderListDialog, ComboBox, SwitchButton,
-    CardWidget, ScrollArea,
-    HyperlinkLabel, ImageLabel, IconWidget
+    MessageBox, ScrollArea, HyperlinkLabel, CardWidget
 )
 import asyncio
 from datetime import datetime
@@ -262,52 +261,47 @@ class ConversionWorker(QThread):
 
 
 class ConverterInterface(ScrollArea):
-    """Main converter interface"""
+    """Main converter interface following PyQt-Fluent-Widgets best practices"""
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.parent_window = parent
         self.worker = None
         self.current_language = "en_US"
+        self.view = QWidget(self)
+        self.vBoxLayout = QVBoxLayout(self.view)
+
         self._init_ui()
         self._apply_translations()
 
     def _init_ui(self):
         """Initialize the UI"""
-        self.setObjectName("converterInterface")
+        self.view.setObjectName('view')
+        self.setObjectName('converterInterface')
+
+        # Scroll area settings
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setWidget(self.view)
         self.setWidgetResizable(True)
 
-        # Create main container widget
-        self.container = QWidget()
-        self.container.setMinimumWidth(850)
+        # Main layout settings
+        self.vBoxLayout.setContentsMargins(36, 20, 36, 20)
+        self.vBoxLayout.setSpacing(16)
+        self.vBoxLayout.setAlignment(Qt.AlignTop)
 
-        # Main layout
-        main_layout = QVBoxLayout(self.container)
-        main_layout.setSpacing(12)
-        main_layout.setContentsMargins(20, 20, 20, 20)
-
-        # Title section
-        title_layout = QVBoxLayout()
-        title_layout.setSpacing(5)
-
+        # Title
         title = SubtitleLabel("M3U8 to MP4 Converter")
         title.setAlignment(Qt.AlignCenter)
-        title_layout.addWidget(title)
+        self.vBoxLayout.addWidget(title)
 
+        # Description
         desc = BodyLabel("Convert M3U8 video streams to MP4 format with ease")
         desc.setAlignment(Qt.AlignCenter)
-        title_layout.addWidget(desc)
+        self.vBoxLayout.addWidget(desc)
 
-        main_layout.addLayout(title_layout)
-
-        # Input section
-        input_card = CardWidget()
-        input_layout = QVBoxLayout(input_card)
-        input_layout.setContentsMargins(15, 12, 15, 12)
-        input_layout.setSpacing(8)
-
-        input_header = StrongBodyLabel("Input Source")
-        input_layout.addWidget(input_header)
+        # Input section card
+        input_card = self._create_card("Input Source")
+        input_layout = input_card.layout()
 
         url_row = QHBoxLayout()
         url_row.setSpacing(8)
@@ -325,16 +319,11 @@ class ConverterInterface(ScrollArea):
         url_row.addWidget(self.btn_browse)
 
         input_layout.addLayout(url_row)
-        main_layout.addWidget(input_card)
+        self.vBoxLayout.addWidget(input_card)
 
-        # Output section
-        output_card = CardWidget()
-        output_layout = QVBoxLayout(output_card)
-        output_layout.setContentsMargins(15, 12, 15, 12)
-        output_layout.setSpacing(8)
-
-        output_header = StrongBodyLabel("Output Settings")
-        output_layout.addWidget(output_header)
+        # Output section card
+        output_card = self._create_card("Output Settings")
+        output_layout = output_card.layout()
 
         output_row = QHBoxLayout()
         output_row.setSpacing(8)
@@ -351,52 +340,51 @@ class ConverterInterface(ScrollArea):
         output_row.addWidget(self.btn_browse_output)
 
         output_layout.addLayout(output_row)
-        main_layout.addWidget(output_card)
+        self.vBoxLayout.addWidget(output_card)
 
-        # Control buttons
-        control_layout = QHBoxLayout()
-        control_layout.setSpacing(10)
-        control_layout.addStretch(1)
+        # Control buttons card
+        control_card = self._create_card("Controls")
+        control_layout = control_card.layout()
+
+        control_row = QHBoxLayout()
+        control_row.setSpacing(10)
+        control_row.addStretch(1)
 
         self.btn_convert = PrimaryPushButton("Convert")
         self.btn_convert.setFixedWidth(100)
         self.btn_convert.clicked.connect(self._start_conversion)
-        control_layout.addWidget(self.btn_convert)
+        control_row.addWidget(self.btn_convert)
 
         self.btn_pause = PushButton("Pause")
         self.btn_pause.setFixedWidth(80)
         self.btn_pause.clicked.connect(self._pause_conversion)
         self.btn_pause.setEnabled(False)
-        control_layout.addWidget(self.btn_pause)
+        control_row.addWidget(self.btn_pause)
 
         self.btn_stop = PushButton("Stop")
         self.btn_stop.setFixedWidth(80)
         self.btn_stop.clicked.connect(self._stop_conversion)
         self.btn_stop.setEnabled(False)
-        control_layout.addWidget(self.btn_stop)
+        control_row.addWidget(self.btn_stop)
 
         self.btn_open_folder = PushButton("Open Folder")
         self.btn_open_folder.setFixedWidth(110)
         self.btn_open_folder.clicked.connect(self._open_output_folder)
         self.btn_open_folder.setEnabled(False)
-        control_layout.addWidget(self.btn_open_folder)
+        control_row.addWidget(self.btn_open_folder)
 
-        control_layout.addStretch(1)
-        main_layout.addLayout(control_layout)
+        control_row.addStretch(1)
+        control_layout.addLayout(control_row)
+        self.vBoxLayout.addWidget(control_card)
 
-        # Progress section
-        progress_card = CardWidget()
-        progress_layout = QVBoxLayout(progress_card)
-        progress_layout.setContentsMargins(15, 12, 15, 12)
-        progress_layout.setSpacing(8)
-
-        progress_header = StrongBodyLabel("Conversion Progress")
-        progress_layout.addWidget(progress_header)
+        # Progress section card
+        progress_card = self._create_card("Conversion Progress")
+        progress_layout = progress_card.layout()
 
         self.progress_bar = ProgressBar()
         self.progress_bar.setValue(0)
         self.progress_bar.setRange(0, 100)
-        self.progress_bar.setFixedHeight(25)
+        self.progress_bar.setFixedHeight(28)
         progress_layout.addWidget(self.progress_bar)
 
         # Progress info
@@ -409,16 +397,15 @@ class ConverterInterface(ScrollArea):
         progress_info_row.addWidget(self.speed_label)
         progress_layout.addLayout(progress_info_row)
 
-        main_layout.addWidget(progress_card)
+        self.vBoxLayout.addWidget(progress_card)
 
-        # Log section
-        log_card = CardWidget()
-        log_layout = QVBoxLayout(log_card)
-        log_layout.setContentsMargins(15, 12, 15, 12)
-        log_layout.setSpacing(8)
+        # Log section card
+        log_card = self._create_card("Conversion Log")
+        log_layout = log_card.layout()
 
         log_header_row = QHBoxLayout()
-        log_header = StrongBodyLabel("Conversion Log")
+        log_header_row.setSpacing(8)
+        log_header = StrongBodyLabel("Log Messages")
         log_header_row.addWidget(log_header)
         log_header_row.addStretch()
 
@@ -431,16 +418,25 @@ class ConverterInterface(ScrollArea):
 
         self.log_text = TextEdit()
         self.log_text.setReadOnly(True)
-        self.log_text.setMinimumHeight(200)
+        self.log_text.setMinimumHeight(220)
         log_layout.addWidget(self.log_text)
 
-        main_layout.addWidget(log_card, 1)  # Give log card stretch factor
+        self.vBoxLayout.addWidget(log_card, 1)  # Give stretch to log card
 
-        # Set scroll area widget
-        self.setWidget(self.container)
-
-        # Enable drag and drop on the scroll area
+        # Enable drag and drop
         self.setAcceptDrops(True)
+
+    def _create_card(self, title: str) -> CardWidget:
+        """Create a card widget with title and layout"""
+        card = CardWidget()
+        layout = QVBoxLayout(card)
+        layout.setContentsMargins(20, 16, 20, 16)
+        layout.setSpacing(12)
+
+        header = StrongBodyLabel(title)
+        layout.addWidget(header)
+
+        return card
 
     def _apply_translations(self):
         """Apply translations based on current language"""
@@ -454,7 +450,7 @@ class ConverterInterface(ScrollArea):
                 "pause": "Pause",
                 "stop": "Stop",
                 "open_folder": "Open Folder",
-                "clear_log": "Clear Log",
+                "clear_log": "Clear",
                 "status_ready": "Status: Ready",
                 "speed": "Speed: -",
             },
@@ -467,7 +463,7 @@ class ConverterInterface(ScrollArea):
                 "pause": "暂停",
                 "stop": "停止",
                 "open_folder": "打开文件夹",
-                "clear_log": "清空日志",
+                "clear_log": "清空",
                 "status_ready": "状态: 就绪",
                 "speed": "速度: -",
             }
@@ -741,7 +737,7 @@ class ConverterInterface(ScrollArea):
 
 
 class MainWindow(FluentWindow):
-    """Fluent Design main window"""
+    """Fluent Design main window following PyQt-Fluent-Widgets best practices"""
 
     def __init__(self):
         super().__init__()
@@ -755,9 +751,15 @@ class MainWindow(FluentWindow):
         """Initialize window properties"""
         self.setWindowTitle("M3U8 to MP4 Converter")
         self.setMinimumSize(1000, 750)
+        self.resize(1000, 750)
 
         # Remove margins from stacked widget
         self.stackedWidget.setContentsMargins(0, 0, 0, 0)
+
+        # Center window on screen
+        desktop = QApplication.desktop().availableGeometry()
+        w, h = desktop.width(), desktop.height()
+        self.move(w//2 - self.width()//2, h//2 - self.height()//2)
 
     def _create_navigation(self):
         """Create navigation interface"""
@@ -767,7 +769,7 @@ class MainWindow(FluentWindow):
         # Add to navigation
         self.addSubInterface(
             self.converter_interface,
-            FluentIcon.VIDEO,
+            FIF.VIDEO,
             "Converter"
         )
 
@@ -775,7 +777,7 @@ class MainWindow(FluentWindow):
         self.about_interface = AboutInterface(self)
         self.addSubInterface(
             self.about_interface,
-            FluentIcon.INFO,
+            FIF.INFO,
             "About",
             position=NavigationItemPosition.BOTTOM
         )
@@ -803,34 +805,40 @@ class MainWindow(FluentWindow):
 
 
 class AboutInterface(ScrollArea):
-    """About interface"""
+    """About interface following PyQt-Fluent-Widgets best practices"""
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.view = QWidget(self)
+        self.vBoxLayout = QVBoxLayout(self.view)
         self._init_ui()
 
     def _init_ui(self):
         """Initialize the UI"""
-        self.setObjectName("aboutInterface")
+        self.view.setObjectName('view')
+        self.setObjectName('aboutInterface')
+
+        # Scroll area settings
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setWidget(self.view)
         self.setWidgetResizable(True)
 
-        # Create container widget
-        container = QWidget()
-        layout = QVBoxLayout(container)
-        layout.setSpacing(15)
-        layout.setContentsMargins(30, 30, 30, 30)
+        # Main layout settings
+        self.vBoxLayout.setContentsMargins(36, 40, 36, 36)
+        self.vBoxLayout.setSpacing(20)
+        self.vBoxLayout.setAlignment(Qt.AlignTop)
 
         # Title
         title = SubtitleLabel("M3U8 to MP4 Converter")
         title.setAlignment(Qt.AlignCenter)
-        layout.addWidget(title)
+        self.vBoxLayout.addWidget(title)
 
         # Version
         version = BodyLabel("Version 1.0.0")
         version.setAlignment(Qt.AlignCenter)
-        layout.addWidget(version)
+        self.vBoxLayout.addWidget(version)
 
-        # Description
+        # Description card
         desc_card = CardWidget()
         desc_layout = QVBoxLayout(desc_card)
         desc_layout.setContentsMargins(20, 20, 20, 20)
@@ -849,9 +857,9 @@ class AboutInterface(ScrollArea):
         desc.setWordWrap(True)
         desc_layout.addWidget(desc)
 
-        layout.addWidget(desc_card)
+        self.vBoxLayout.addWidget(desc_card)
 
-        # GitHub link
+        # GitHub link card
         link_card = CardWidget()
         link_layout = QVBoxLayout(link_card)
         link_layout.setContentsMargins(20, 15, 20, 15)
@@ -864,8 +872,6 @@ class AboutInterface(ScrollArea):
         link_row.addStretch()
 
         link_layout.addLayout(link_row)
-        layout.addWidget(link_card)
+        self.vBoxLayout.addWidget(link_card)
 
-        layout.addStretch()
-
-        self.setWidget(container)
+        self.vBoxLayout.addStretch()
