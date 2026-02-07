@@ -756,6 +756,9 @@ class MainWindow(FluentWindow):
         self.setWindowTitle("M3U8 to MP4 Converter")
         self.setMinimumSize(1000, 750)
 
+        # Remove margins from stacked widget
+        self.stackedWidget.setContentsMargins(0, 0, 0, 0)
+
     def _create_navigation(self):
         """Create navigation interface"""
         # Create converter interface
