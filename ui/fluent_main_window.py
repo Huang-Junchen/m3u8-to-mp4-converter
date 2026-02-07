@@ -7,7 +7,7 @@ import sys
 import os
 from pathlib import Path
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QUrl
-from PyQt5.QtGui import QDragEnterEvent, QDropEvent
+from PyQt5.QtGui import QDragEnterEvent, QDropEvent, QIcon
 from PyQt5.QtWidgets import QApplication, QFileDialog, QVBoxLayout, QHBoxLayout
 from qfluentwidgets import (
     FluentWindow, NavigationItemPosition, FluentIcon,
@@ -834,7 +834,6 @@ class AboutInterface(ScrollArea):
         link_layout.addStretch()
         github_link = HyperlinkLabel("https://github.com/zhiyiYo/PyQt-Fluent-Widgets", self)
         github_link.setText("UI Library: PyQt-Fluent-Widgets")
-        github_link.setIcon(FluentIcon.GITHUB)
         link_layout.addWidget(github_link)
         link_layout.addStretch()
         layout.addLayout(link_layout)
