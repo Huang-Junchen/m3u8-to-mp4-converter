@@ -277,36 +277,42 @@ class ConverterInterface(ScrollArea):
         self.setObjectName("converterInterface")
         self.setWidgetResizable(True)
 
-        # Create container widget
-        self.container = CardWidget()
-        self.container.setFixedHeight(780)
+        # Create main container widget
+        self.container = QWidget()
+        self.container.setMinimumWidth(850)
 
         # Main layout
-        layout = QVBoxLayout(self.container)
-        layout.setSpacing(20)
-        layout.setContentsMargins(35, 35, 35, 35)
+        main_layout = QVBoxLayout(self.container)
+        main_layout.setSpacing(12)
+        main_layout.setContentsMargins(20, 20, 20, 20)
 
-        # Title
+        # Title section
+        title_layout = QVBoxLayout()
+        title_layout.setSpacing(5)
+
         title = SubtitleLabel("M3U8 to MP4 Converter")
         title.setAlignment(Qt.AlignCenter)
-        layout.addWidget(title)
+        title_layout.addWidget(title)
 
-        # Description
         desc = BodyLabel("Convert M3U8 video streams to MP4 format with ease")
         desc.setAlignment(Qt.AlignCenter)
-        layout.addWidget(desc)
+        title_layout.addWidget(desc)
 
-        # Input section card
+        main_layout.addLayout(title_layout)
+
+        # Input section
         input_card = CardWidget()
         input_layout = QVBoxLayout(input_card)
+        input_layout.setContentsMargins(15, 12, 15, 12)
+        input_layout.setSpacing(8)
 
-        # Input header
-        input_header = SubtitleLabel("Input Source")
+        input_header = StrongBodyLabel("Input Source")
         input_layout.addWidget(input_header)
 
-        # URL input
         url_row = QHBoxLayout()
-        url_label = StrongBodyLabel("URL or File:")
+        url_row.setSpacing(8)
+        url_label = BodyLabel("URL:")
+        url_label.setMinimumWidth(50)
         self.url_input = LineEdit()
         self.url_input.setPlaceholderText("Enter M3U8 URL or drag and drop file here")
         self.url_input.setDragEnabled(True)
@@ -314,82 +320,88 @@ class ConverterInterface(ScrollArea):
         url_row.addWidget(self.url_input, 1)
 
         self.btn_browse = PushButton("Browse")
+        self.btn_browse.setFixedWidth(80)
         self.btn_browse.clicked.connect(self._browse_m3u8_file)
         url_row.addWidget(self.btn_browse)
 
         input_layout.addLayout(url_row)
-        layout.addWidget(input_card)
+        main_layout.addWidget(input_card)
 
-        # Output section card
+        # Output section
         output_card = CardWidget()
         output_layout = QVBoxLayout(output_card)
+        output_layout.setContentsMargins(15, 12, 15, 12)
+        output_layout.setSpacing(8)
 
-        # Output header
-        output_header = SubtitleLabel("Output Settings")
+        output_header = StrongBodyLabel("Output Settings")
         output_layout.addWidget(output_header)
 
-        # Output path
         output_row = QHBoxLayout()
-        output_label = StrongBodyLabel("Save to:")
+        output_row.setSpacing(8)
+        output_label = BodyLabel("Save to:")
+        output_label.setMinimumWidth(50)
         self.output_path = LineEdit()
         self.output_path.setPlaceholderText("Select output MP4 file path")
         output_row.addWidget(output_label)
         output_row.addWidget(self.output_path, 1)
 
         self.btn_browse_output = PushButton("Browse")
+        self.btn_browse_output.setFixedWidth(80)
         self.btn_browse_output.clicked.connect(self._browse_output_file)
         output_row.addWidget(self.btn_browse_output)
 
         output_layout.addLayout(output_row)
-        layout.addWidget(output_card)
+        main_layout.addWidget(output_card)
 
         # Control buttons
-        control_card = CardWidget()
-        control_layout = QVBoxLayout(control_card)
-
-        control_header = SubtitleLabel("Controls")
-        control_layout.addWidget(control_header)
-
-        control_row = QHBoxLayout()
-        control_row.addStretch(1)
+        control_layout = QHBoxLayout()
+        control_layout.setSpacing(10)
+        control_layout.addStretch(1)
 
         self.btn_convert = PrimaryPushButton("Convert")
+        self.btn_convert.setFixedWidth(100)
         self.btn_convert.clicked.connect(self._start_conversion)
-        control_row.addWidget(self.btn_convert)
+        control_layout.addWidget(self.btn_convert)
 
         self.btn_pause = PushButton("Pause")
+        self.btn_pause.setFixedWidth(80)
         self.btn_pause.clicked.connect(self._pause_conversion)
         self.btn_pause.setEnabled(False)
-        control_row.addWidget(self.btn_pause)
+        control_layout.addWidget(self.btn_pause)
 
         self.btn_stop = PushButton("Stop")
+        self.btn_stop.setFixedWidth(80)
         self.btn_stop.clicked.connect(self._stop_conversion)
         self.btn_stop.setEnabled(False)
-        control_row.addWidget(self.btn_stop)
+        control_layout.addWidget(self.btn_stop)
 
         self.btn_open_folder = PushButton("Open Folder")
+        self.btn_open_folder.setFixedWidth(110)
         self.btn_open_folder.clicked.connect(self._open_output_folder)
         self.btn_open_folder.setEnabled(False)
-        control_row.addWidget(self.btn_open_folder)
+        control_layout.addWidget(self.btn_open_folder)
 
-        control_row.addStretch(1)
-        control_layout.addLayout(control_row)
-        layout.addWidget(control_card)
+        control_layout.addStretch(1)
+        main_layout.addLayout(control_layout)
 
         # Progress section
         progress_card = CardWidget()
         progress_layout = QVBoxLayout(progress_card)
+        progress_layout.setContentsMargins(15, 12, 15, 12)
+        progress_layout.setSpacing(8)
 
-        progress_header = SubtitleLabel("Conversion Progress")
+        progress_header = StrongBodyLabel("Conversion Progress")
         progress_layout.addWidget(progress_header)
 
         self.progress_bar = ProgressBar()
         self.progress_bar.setValue(0)
         self.progress_bar.setRange(0, 100)
+        self.progress_bar.setFixedHeight(25)
         progress_layout.addWidget(self.progress_bar)
 
         # Progress info
         progress_info_row = QHBoxLayout()
+        progress_info_row.setSpacing(15)
         self.status_label = BodyLabel("Status: Ready")
         progress_info_row.addWidget(self.status_label)
         progress_info_row.addStretch()
@@ -397,30 +409,33 @@ class ConverterInterface(ScrollArea):
         progress_info_row.addWidget(self.speed_label)
         progress_layout.addLayout(progress_info_row)
 
-        layout.addWidget(progress_card)
+        main_layout.addWidget(progress_card)
 
         # Log section
         log_card = CardWidget()
         log_layout = QVBoxLayout(log_card)
+        log_layout.setContentsMargins(15, 12, 15, 12)
+        log_layout.setSpacing(8)
 
-        log_header = SubtitleLabel("Conversion Log")
-        log_layout.addWidget(log_header)
+        log_header_row = QHBoxLayout()
+        log_header = StrongBodyLabel("Conversion Log")
+        log_header_row.addWidget(log_header)
+        log_header_row.addStretch()
+
+        btn_clear_log = PushButton("Clear")
+        btn_clear_log.setFixedWidth(70)
+        btn_clear_log.clicked.connect(self._clear_log)
+        log_header_row.addWidget(btn_clear_log)
+
+        log_layout.addLayout(log_header_row)
 
         self.log_text = TextEdit()
         self.log_text.setReadOnly(True)
-        self.log_text.setFixedHeight(180)
+        self.log_text.setMinimumHeight(200)
+        self.log_text.setFrameVisible(True)
         log_layout.addWidget(self.log_text)
 
-        # Clear log button
-        clear_log_row = QHBoxLayout()
-        clear_log_row.addStretch()
-        btn_clear_log = PushButton("Clear Log")
-        btn_clear_log.clicked.connect(self._clear_log)
-        clear_log_row.addWidget(btn_clear_log)
-        log_layout.addLayout(clear_log_row)
-
-        layout.addWidget(log_card)
-        layout.addStretch()
+        main_layout.addWidget(log_card, 1)  # Give log card stretch factor
 
         # Set scroll area widget
         self.setWidget(self.container)
