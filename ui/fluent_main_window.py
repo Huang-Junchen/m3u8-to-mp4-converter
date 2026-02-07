@@ -832,12 +832,9 @@ class AboutInterface(ScrollArea):
         # GitHub link
         link_layout = QHBoxLayout()
         link_layout.addStretch()
-        github_link = HyperlinkLabel(
-            "https://github.com/zhiyiYo/PyQt-Fluent-Widgets",
-            self,
-            FluentIcon.GITHUB
-        )
+        github_link = HyperlinkLabel("https://github.com/zhiyiYo/PyQt-Fluent-Widgets", self)
         github_link.setText("UI Library: PyQt-Fluent-Widgets")
+        github_link.setIcon(FluentIcon.GITHUB)
         link_layout.addWidget(github_link)
         link_layout.addStretch()
         layout.addLayout(link_layout)
