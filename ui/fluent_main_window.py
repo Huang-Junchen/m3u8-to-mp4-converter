@@ -15,7 +15,7 @@ from qfluentwidgets import (
     TextEdit, SubtitleLabel, StrongBodyLabel, BodyLabel,
     InfoBar, InfoBarPosition, setTheme, Theme,
     MessageBox, FolderListDialog, ComboBox, SwitchButton,
-    CardWidget, GroupHeaderCardWidget, ScrollArea,
+    CardWidget, ScrollArea,
     HyperlinkLabel, ImageLabel, IconWidget
 )
 import asyncio
@@ -297,9 +297,12 @@ class ConverterInterface(ScrollArea):
         layout.addWidget(desc)
 
         # Input section card
-        input_card = GroupHeaderCardWidget()
-        input_card.setTitle("Input Source")
+        input_card = CardWidget()
         input_layout = QVBoxLayout(input_card)
+
+        # Input header
+        input_header = SubtitleLabel("Input Source")
+        input_layout.addWidget(input_header)
 
         # URL input
         url_row = QHBoxLayout()
@@ -318,9 +321,12 @@ class ConverterInterface(ScrollArea):
         layout.addWidget(input_card)
 
         # Output section card
-        output_card = GroupHeaderCardWidget()
-        output_card.setTitle("Output Settings")
+        output_card = CardWidget()
         output_layout = QVBoxLayout(output_card)
+
+        # Output header
+        output_header = SubtitleLabel("Output Settings")
+        output_layout.addWidget(output_header)
 
         # Output path
         output_row = QHBoxLayout()
@@ -338,6 +344,12 @@ class ConverterInterface(ScrollArea):
         layout.addWidget(output_card)
 
         # Control buttons
+        control_card = CardWidget()
+        control_layout = QVBoxLayout(control_card)
+
+        control_header = SubtitleLabel("Controls")
+        control_layout.addWidget(control_header)
+
         control_row = QHBoxLayout()
         control_row.addStretch(1)
 
@@ -361,12 +373,15 @@ class ConverterInterface(ScrollArea):
         control_row.addWidget(self.btn_open_folder)
 
         control_row.addStretch(1)
-        layout.addLayout(control_row)
+        control_layout.addLayout(control_row)
+        layout.addWidget(control_card)
 
         # Progress section
-        progress_card = GroupHeaderCardWidget()
-        progress_card.setTitle("Conversion Progress")
+        progress_card = CardWidget()
         progress_layout = QVBoxLayout(progress_card)
+
+        progress_header = SubtitleLabel("Conversion Progress")
+        progress_layout.addWidget(progress_header)
 
         self.progress_bar = ProgressBar()
         self.progress_bar.setValue(0)
@@ -385,9 +400,11 @@ class ConverterInterface(ScrollArea):
         layout.addWidget(progress_card)
 
         # Log section
-        log_card = GroupHeaderCardWidget()
-        log_card.setTitle("Conversion Log")
+        log_card = CardWidget()
         log_layout = QVBoxLayout(log_card)
+
+        log_header = SubtitleLabel("Conversion Log")
+        log_layout.addWidget(log_header)
 
         self.log_text = TextEdit()
         self.log_text.setReadOnly(True)
