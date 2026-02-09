@@ -5,6 +5,7 @@ __pycache__/
 *.so
 .Python
 build/
+build_pyinstaller/
 develop-eggs/
 dist/
 downloads/
@@ -19,6 +20,10 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# PyInstaller
+*.spec
+*.manifest
 
 # Virtual Environment
 venv/
@@ -36,6 +41,7 @@ env/
 
 # Application specific
 segments/
+*_segments/
 *.mp4
 *.m3u8
 *.ts
