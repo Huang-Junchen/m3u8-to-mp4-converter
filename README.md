@@ -275,6 +275,30 @@ diagnose_vs.bat
 ```
 这会检查你的 Visual Studio 安装并给出具体建议。
 
+**Nuitka 编译错误（内存、assertion failed 等）**
+
+Nuitka 在处理某些 Python 包（如 aiohttp）时可能会遇到内部错误。解决方法：
+
+1. **使用修复版打包脚本**
+```bash
+build_fixed.bat
+```
+这个脚本使用了更保守的 Nuitka 参数，排除了有问题的 C 扩展模块。
+
+2. **升级 Nuitka**
+```bash
+uv pip install --upgrade nuitka
+```
+
+3. **推荐：使用 PyInstaller**
+PyInstaller 更加稳定可靠，不需要编译器：
+```bash
+build_pyinstaller.bat
+```
+
+4. **减少并行任务**
+如果内存不足，关闭其他应用程序后重试。
+
 **错误：Failed to find Qt**
 - 确保 `--enable-plugin=pyqt5` 参数存在
 - 检查PyQt5是否正确安装
