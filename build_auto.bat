@@ -130,7 +130,7 @@ python -m nuitka ^
     --include-data-dir=i18n=i18n ^
     --include-package=PyQt5 ^
     --include-package=aiohttp ^
-    --include-package=pycryptodome ^
+    --include-package=Crypto ^
     --include-package=asyncio_throttle ^
     --include-package=colorthief ^
     --nofollow-import-to=tkinter ^
