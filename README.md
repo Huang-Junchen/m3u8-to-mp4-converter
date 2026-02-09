@@ -119,6 +119,183 @@ python main.py
    - 转换完成后点击"Open Folder"打开输出文件夹
    - 在"Log"区域查看详细日志
 
+## 打包指南
+
+本项目提供了两种打包方式：PyInstaller（推荐新手）和 Nuitka（性能更好）。
+
+### 方案A：使用PyInstaller（推荐 - 简单快速）
+
+**优点：**
+- 不需要C编译器
+- 设置简单，5分钟完成
+- 适合快速打包
+
+**步骤：**
+
+直接运行打包脚本：
+
+```bash
+build_pyinstaller.bat
+```
+
+脚本会自动完成以下操作：
+1. 安装PyInstaller（如果未安装）
+2. 执行打包
+3. 生成 `dist\M3U8Converter.exe`
+
+**手动打包：**
+
+```bash
+uv pip install pyinstaller
+
+pyinstaller ^
+    --onefile ^
+    --windowed ^
+    --name "M3U8Converter" ^
+    --add-data "resources;resources" ^
+    --add-data "i18n;i18n" ^
+    --hidden-import PyQt5 ^
+    --hidden-import aiohttp ^
+    --hidden-import pycryptodome ^
+    --hidden-import asyncio_throttle ^
+    --exclude-module tkinter ^
+    --exclude-module matplotlib ^
+    --distpath dist ^
+    main.py
+```
+
+### 方案B：使用Nuitka（性能更好）
+
+**优点：**
+- 性能更优
+- 启动更快
+- 文件可能更小
+
+**缺点：**
+- 需要安装C编译器（6-8 GB工具）
+- 安装时间15-30分钟
+
+#### 步骤1：安装Visual Studio Build Tools
+
+1. **下载安装程序**
+   - 访问：https://visualstudio.microsoft.com/downloads/
+   - 或使用直接链接：https://aka.ms/vs/17/release/vs_buildtools.exe
+
+2. **运行安装程序**
+   - 双击运行 `vs_buildtools.exe`
+   - 选择 **"Desktop development with C++"** 工作负载
+   - 确保以下组件被选中：
+     - MSVC v143 - VS 2022 C++ x64/x86 build tools
+     - Windows 11 SDK（或 Windows 10 SDK）
+
+3. **等待安装完成**
+   - 下载大小：约 6-8 GB
+   - 安装时间：15-30分钟
+
+4. **验证安装**
+   - 按 `Win` 键搜索 "Developer Command Prompt for VS 2022"
+   - 打开后输入：`cl`
+   - 应显示编译器版本信息
+
+#### 步骤2：运行打包脚本
+
+**智能打包脚本（推荐）：**
+
+```bash
+build_auto.bat
+```
+
+此脚本会：
+- 自动检测编译器
+- 自动设置编译环境
+- 自动安装Nuitka（如果需要）
+- 清理旧的构建文件
+- 执行完整打包
+
+**标准打包脚本：**
+
+```bash
+build.bat
+```
+
+**手动打包：**
+
+```bash
+# 1. 激活虚拟环境
+.venv\Scripts\activate
+
+# 2. 设置编译环境（如果需要）
+call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
+
+# 3. 运行Nuitka
+python -m nuitka ^
+    --standalone ^
+    --onefile ^
+    --enable-plugin=pyqt5 ^
+    --windows-console-mode=disable ^
+    --company-name="M3U8Converter" ^
+    --product-name="M3U8 to MP4 Converter" ^
+    --file-version=1.0.0.0 ^
+    --product-version=1.0.0 ^
+    --include-data-dir=resources=resources ^
+    --include-data-dir=i18n=i18n ^
+    --include-package=PyQt5 ^
+    --include-package=aiohttp ^
+    --include-package=pycryptodome ^
+    --remove-output ^
+    --output-dir=dist ^
+    main.py
+```
+
+### 常见打包问题
+
+**错误：No module named nuitka**
+```bash
+uv pip install nuitka
+```
+
+**错误：No C compiler found**
+- PyInstaller：不需要编译器，使用 `build_pyinstaller.bat`
+- Nuitka：按照上述步骤安装 Visual Studio Build Tools
+
+**错误：Failed to find Qt**
+- 确保 `--enable-plugin=pyqt5` 参数存在
+- 检查PyQt5是否正确安装
+
+### 打包参数说明
+
+**PyInstaller 参数：**
+- `--onefile` - 单文件打包
+- `--windowed` - 无控制台窗口
+- `--add-data` - 包含数据文件
+- `--hidden-import` - 显式导入模块
+- `--exclude-module` - 排除不需要的模块
+
+**Nuitka 参数：**
+- `--standalone` - 独立可执行文件
+- `--onefile` - 单文件打包
+- `--enable-plugin=pyqt5` - PyQt5支持
+- `--windows-console-mode=disable` - 无控制台窗口
+- `--include-data-dir` - 包含资源和国际化文件
+- `--remove-output` - 清理临时文件
+
+### Nuitka vs PyInstaller 对比
+
+| 特性 | Nuitka | PyInstaller |
+|------|--------|-------------|
+| 编译需求 | 需要C编译器 | 不需要编译器 |
+| 性能 | 更快（编译成C） | 较慢（Python解释） |
+| 文件大小 | 较大 | 较大 |
+| 启动速度 | 快 | 慢 |
+| 兼容性 | 好 | 很好 |
+| 设置复杂度 | 高 | 低 |
+
+### 打包完成后
+
+1. 检查 `dist` 目录是否生成了可执行文件
+2. 将可执行文件复制到独立目录测试
+3. 确保FFmpeg在系统PATH中或在程序目录中
+
 ## 项目结构
 
 ```
@@ -127,25 +304,35 @@ m3u8-to-mp4-converter/
 ├── requirements.txt        # 依赖列表
 ├── README.md              # 项目文档
 ├── CLAUDE.md              # 项目规范
+├── build.bat              # Nuitka打包脚本
+├── build_auto.bat         # 智能打包脚本
+├── build_pyinstaller.bat  # PyInstaller打包脚本
+├── check_compiler.bat     # 编译器检查脚本
 ├── src/                   # 核心模块
+│   ├── __init__.py
 │   ├── downloader.py      # M3U8下载器
 │   └── converter.py       # MP4转换器
 ├── ui/                    # 用户界面
-│   └── main_window.py     # 主窗口
-├── i18n/                  # 国际化
-│   ├── en_US.ts          # 英文翻译
-│   └── zh_CN.ts          # 中文翻译
-└── resources/             # 资源文件
-    └── styles.qss         # QSS样式表
+│   ├── __init__.py
+│   ├── main_window.py     # 主窗口（经典UI）
+│   └── fluent_main_window.py  # 主窗口（Fluent UI）
+├── tests/                 # 测试
+│   └── test_converter.py
+├── resources/             # 资源文件
+│   └── styles.qss         # QSS样式表
+└── i18n/                  # 国际化
+    ├── en_US.ts          # 英文翻译
+    └── zh_CN.ts          # 中文翻译
 ```
 
 ## 技术栈
 
-- **UI框架**: PyQt5
+- **UI框架**: PyQt5, PyQt-Fluent-Widgets
 - **网络请求**: aiohttp, requests
 - **加密**: pycryptodome
 - **视频处理**: FFmpeg
 - **异步编程**: asyncio
+- **打包工具**: PyInstaller, Nuitka
 
 ## 开发
 
@@ -153,6 +340,18 @@ m3u8-to-mp4-converter/
 
 ```bash
 python main.py
+```
+
+### UI模式切换
+
+默认使用Fluent UI。要使用经典UI：
+
+```bash
+# Windows
+set USE_FLUENT_UI=false && python main.py
+
+# Linux/macOS
+USE_FLUENT_UI=false python main.py
 ```
 
 ### 测试
@@ -176,6 +375,14 @@ A: 检查日志输出，常见原因包括：
 **Q: 支持加密的M3U8吗？**
 A: 支持，程序会自动检测并处理AES-128加密。
 
+**Q: 打包后文件太大？**
+A: 正常大小，因为包含：
+- Python运行时
+- PyQt5库
+- 所有依赖
+
+Nuitka打包约50-150MB，PyInstaller打包约80-200MB。
+
 ## 许可证
 
 MIT License
@@ -193,3 +400,4 @@ MIT License
 - 多线程下载
 - 暂停/继续功能
 - 中英文界面
+- Fluent Design UI

@@ -22,7 +22,11 @@
       "Bash(\".venv/Scripts/python.exe\" -m pip install \"PyQt-Fluent-Widgets[full]\" -i https://pypi.org/simple/)",
       "Bash(\".venv/Scripts/python.exe\" main.py)",
       "mcp__zread__get_repo_structure",
-      "mcp__zread__read_file"
+      "mcp__zread__read_file",
+      "Bash(.venvScriptspython.exe:*)",
+      "Bash(.venv/Scripts/python.exe:*)",
+      "Bash(cmd.exe:*)",
+      "Bash(test:*)"
     ]
   }
 }
