@@ -121,33 +121,40 @@ python main.py
 
 ## 打包指南
 
-本项目提供了两种打包方式：PyInstaller（推荐新手）和 Nuitka（性能更好）。
+本项目使用 PyInstaller 打包成独立的可执行文件。
 
-### 方案A：使用PyInstaller（推荐 - 简单快速）
-
-**优点：**
-- 不需要C编译器
-- 设置简单，5分钟完成
-- 适合快速打包
-
-**步骤：**
+### 快速开始
 
 直接运行打包脚本：
+
+```bash
+build
+```
+
+或者：
 
 ```bash
 build_pyinstaller.bat
 ```
 
 脚本会自动完成以下操作：
-1. 安装PyInstaller（如果未安装）
-2. 执行打包
-3. 生成 `dist\M3U8Converter.exe`
+1. 检查并安装 PyInstaller（如果未安装）
+2. 清理旧的构建文件
+3. 执行打包
+4. 生成 `dist\M3U8Converter.exe`
 
-**手动打包：**
+### 手动打包
+
+如果需要自定义打包选项，可以手动运行 PyInstaller：
 
 ```bash
+# 1. 激活虚拟环境
+.venv\Scripts\activate
+
+# 2. 安装 PyInstaller
 uv pip install pyinstaller
 
+# 3. 执行打包
 pyinstaller ^
     --onefile ^
     --windowed ^
@@ -158,178 +165,43 @@ pyinstaller ^
     --hidden-import aiohttp ^
     --hidden-import pycryptodome ^
     --hidden-import asyncio_throttle ^
+    --hidden-import qfluentwidgets ^
     --exclude-module tkinter ^
     --exclude-module matplotlib ^
     --distpath dist ^
     main.py
 ```
 
-### 方案B：使用Nuitka（性能更好）
+### PyInstaller 参数说明
 
-**优点：**
-- 性能更优
-- 启动更快
-- 文件可能更小
-
-**缺点：**
-- 需要安装C编译器（6-8 GB工具）
-- 安装时间15-30分钟
-
-#### 步骤1：安装Visual Studio Build Tools
-
-1. **下载安装程序**
-   - 访问：https://visualstudio.microsoft.com/downloads/
-   - 或使用直接链接：https://aka.ms/vs/17/release/vs_buildtools.exe
-
-2. **运行安装程序**
-   - 双击运行 `vs_buildtools.exe`
-   - 选择 **"Desktop development with C++"** 工作负载
-   - 确保以下组件被选中：
-     - MSVC v143 - VS 2022 C++ x64/x86 build tools
-     - Windows 11 SDK（或 Windows 10 SDK）
-
-3. **等待安装完成**
-   - 下载大小：约 6-8 GB
-   - 安装时间：15-30分钟
-
-4. **验证安装**
-   - 按 `Win` 键搜索 "Developer Command Prompt for VS 2022"
-   - 打开后输入：`cl`
-   - 应显示编译器版本信息
-
-#### 步骤2：运行打包脚本
-
-**智能打包脚本（推荐）：**
-
-```bash
-build_auto.bat
-```
-
-此脚本会：
-- 自动检测编译器
-- 自动设置编译环境
-- 自动安装Nuitka（如果需要）
-- 清理旧的构建文件
-- 执行完整打包
-
-**标准打包脚本：**
-
-```bash
-build.bat
-```
-
-**手动打包：**
-
-```bash
-# 1. 激活虚拟环境
-.venv\Scripts\activate
-
-# 2. 设置编译环境（如果需要）
-call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
-
-# 3. 运行Nuitka
-python -m nuitka ^
-    --standalone ^
-    --onefile ^
-    --enable-plugin=pyqt5 ^
-    --windows-console-mode=disable ^
-    --company-name="M3U8Converter" ^
-    --product-name="M3U8 to MP4 Converter" ^
-    --file-version=1.0.0.0 ^
-    --product-version=1.0.0 ^
-    --include-data-dir=resources=resources ^
-    --include-data-dir=i18n=i18n ^
-    --include-package=PyQt5 ^
-    --include-package=aiohttp ^
-    --include-package=pycryptodome ^
-    --remove-output ^
-    --output-dir=dist ^
-    main.py
-```
-
-### 常见打包问题
-
-**错误：No module named nuitka**
-```bash
-uv pip install nuitka
-```
-
-**错误：No C compiler found**
-**方案1：使用 PyInstaller（推荐，最简单）**
-```bash
-build_pyinstaller.bat
-```
-
-**方案2：使用 x64 Native Tools Command Prompt**
-1. 按 `Win` 键
-2. 搜索 "x64 Native Tools Command Prompt for VS 2022"
-3. 打开后运行：
-```bash
-cd /d "D:\Project\m3u8-to-mp4-converter"
-build_with_compiler.bat
-```
-
-**方案3：诊断问题**
-```bash
-diagnose_vs.bat
-```
-这会检查你的 Visual Studio 安装并给出具体建议。
-
-**Nuitka 编译错误（内存、assertion failed 等）**
-
-Nuitka 在处理某些 Python 包（如 aiohttp）时可能会遇到内部错误。解决方法：
-
-1. **使用修复版打包脚本**
-```bash
-build_fixed.bat
-```
-这个脚本使用了更保守的 Nuitka 参数，排除了有问题的 C 扩展模块。
-
-2. **升级 Nuitka**
-```bash
-uv pip install --upgrade nuitka
-```
-
-3. **推荐：使用 PyInstaller**
-PyInstaller 更加稳定可靠，不需要编译器：
-```bash
-build_pyinstaller.bat
-```
-
-4. **减少并行任务**
-如果内存不足，关闭其他应用程序后重试。
-
-**错误：Failed to find Qt**
-- 确保 `--enable-plugin=pyqt5` 参数存在
-- 检查PyQt5是否正确安装
-
-### 打包参数说明
-
-**PyInstaller 参数：**
-- `--onefile` - 单文件打包
-- `--windowed` - 无控制台窗口
-- `--add-data` - 包含数据文件
+- `--onefile` - 打包成单个可执行文件
+- `--windowed` - 不显示控制台窗口（GUI程序）
+- `--name` - 设置可执行文件名称
+- `--add-data` - 包含数据文件（格式：源;目标）
 - `--hidden-import` - 显式导入模块
 - `--exclude-module` - 排除不需要的模块
+- `--distpath` - 输出目录
 
-**Nuitka 参数：**
-- `--standalone` - 独立可执行文件
-- `--onefile` - 单文件打包
-- `--enable-plugin=pyqt5` - PyQt5支持
-- `--windows-console-mode=disable` - 无控制台窗口
+### 常见问题
+
+**错误：No module named pyinstaller**
+```bash
+uv pip install pyinstaller
+```
+
+**错误：Failed to execute script**
+- 检查是否所有依赖都已安装：`uv pip install -r requirements.txt`
+- 检查 `--hidden-import` 是否包含所有必需的模块
+
+**打包后程序无法启动**
+- 确保 FFmpeg 在系统 PATH 中
+- 或将 FFmpeg 可执行文件复制到程序目录
+
+**文件太大**
+- 正常现象，PyInstaller 打包的文件通常在 80-200 MB
+- 包含了 Python 运行时和所有依赖库
 - `--include-data-dir` - 包含资源和国际化文件
 - `--remove-output` - 清理临时文件
-
-### Nuitka vs PyInstaller 对比
-
-| 特性 | Nuitka | PyInstaller |
-|------|--------|-------------|
-| 编译需求 | 需要C编译器 | 不需要编译器 |
-| 性能 | 更快（编译成C） | 较慢（Python解释） |
-| 文件大小 | 较大 | 较大 |
-| 启动速度 | 快 | 慢 |
-| 兼容性 | 好 | 很好 |
-| 设置复杂度 | 高 | 低 |
 
 ### 打包完成后
 
@@ -345,12 +217,8 @@ m3u8-to-mp4-converter/
 ├── requirements.txt          # 依赖列表
 ├── README.md                # 项目文档
 ├── CLAUDE.md                # 项目规范
-├── build.bat                # Nuitka打包脚本
-├── build_auto.bat           # 智能打包脚本
+├── build.bat                # 快速打包脚本
 ├── build_pyinstaller.bat    # PyInstaller打包脚本
-├── build_with_compiler.bat  # 改进的Nuitka打包脚本
-├── check_compiler.bat       # 编译器检查脚本
-├── diagnose_vs.bat          # Visual Studio诊断工具
 ├── src/                     # 核心模块
 │   ├── __init__.py
 │   ├── downloader.py        # M3U8下载器
@@ -375,7 +243,7 @@ m3u8-to-mp4-converter/
 - **加密**: pycryptodome
 - **视频处理**: FFmpeg
 - **异步编程**: asyncio
-- **打包工具**: PyInstaller, Nuitka
+- **打包工具**: PyInstaller
 
 ## 开发
 
