@@ -255,8 +255,25 @@ uv pip install nuitka
 ```
 
 **错误：No C compiler found**
-- PyInstaller：不需要编译器，使用 `build_pyinstaller.bat`
-- Nuitka：按照上述步骤安装 Visual Studio Build Tools
+**方案1：使用 PyInstaller（推荐，最简单）**
+```bash
+build_pyinstaller.bat
+```
+
+**方案2：使用 x64 Native Tools Command Prompt**
+1. 按 `Win` 键
+2. 搜索 "x64 Native Tools Command Prompt for VS 2022"
+3. 打开后运行：
+```bash
+cd /d "D:\Project\m3u8-to-mp4-converter"
+build_with_compiler.bat
+```
+
+**方案3：诊断问题**
+```bash
+diagnose_vs.bat
+```
+这会检查你的 Visual Studio 安装并给出具体建议。
 
 **错误：Failed to find Qt**
 - 确保 `--enable-plugin=pyqt5` 参数存在
@@ -300,29 +317,31 @@ uv pip install nuitka
 
 ```
 m3u8-to-mp4-converter/
-├── main.py                 # 应用入口
-├── requirements.txt        # 依赖列表
-├── README.md              # 项目文档
-├── CLAUDE.md              # 项目规范
-├── build.bat              # Nuitka打包脚本
-├── build_auto.bat         # 智能打包脚本
-├── build_pyinstaller.bat  # PyInstaller打包脚本
-├── check_compiler.bat     # 编译器检查脚本
-├── src/                   # 核心模块
+├── main.py                   # 应用入口
+├── requirements.txt          # 依赖列表
+├── README.md                # 项目文档
+├── CLAUDE.md                # 项目规范
+├── build.bat                # Nuitka打包脚本
+├── build_auto.bat           # 智能打包脚本
+├── build_pyinstaller.bat    # PyInstaller打包脚本
+├── build_with_compiler.bat  # 改进的Nuitka打包脚本
+├── check_compiler.bat       # 编译器检查脚本
+├── diagnose_vs.bat          # Visual Studio诊断工具
+├── src/                     # 核心模块
 │   ├── __init__.py
-│   ├── downloader.py      # M3U8下载器
-│   └── converter.py       # MP4转换器
-├── ui/                    # 用户界面
+│   ├── downloader.py        # M3U8下载器
+│   └── converter.py         # MP4转换器
+├── ui/                      # 用户界面
 │   ├── __init__.py
-│   ├── main_window.py     # 主窗口（经典UI）
+│   ├── main_window.py       # 主窗口（经典UI）
 │   └── fluent_main_window.py  # 主窗口（Fluent UI）
-├── tests/                 # 测试
+├── tests/                   # 测试
 │   └── test_converter.py
-├── resources/             # 资源文件
-│   └── styles.qss         # QSS样式表
-└── i18n/                  # 国际化
-    ├── en_US.ts          # 英文翻译
-    └── zh_CN.ts          # 中文翻译
+├── resources/               # 资源文件
+│   └── styles.qss           # QSS样式表
+└── i18n/                    # 国际化
+    ├── en_US.ts            # 英文翻译
+    └── zh_CN.ts            # 中文翻译
 ```
 
 ## 技术栈
