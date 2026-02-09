@@ -7,8 +7,16 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import Callable, List, Optional
+
+# Platform-specific configuration
+if sys.platform == 'win32':
+    # Hide console window on Windows
+    SUBPROCESS_FLAGS = subprocess.CREATE_NO_WINDOW
+else:
+    SUBPROCESS_FLAGS = 0
 
 
 class Converter:
@@ -93,7 +101,8 @@ class Converter:
                 text=True,
                 encoding='utf-8',
                 errors='ignore',
-                timeout=10
+                timeout=10,
+                creationflags=SUBPROCESS_FLAGS
             )
 
             if result.returncode == 0:
@@ -183,7 +192,8 @@ class Converter:
                 encoding='utf-8',
                 errors='ignore',
                 bufsize=1,
-                universal_newlines=True
+                universal_newlines=True,
+                creationflags=SUBPROCESS_FLAGS
             )
 
             # Monitor progress
@@ -280,7 +290,8 @@ class Converter:
                 encoding='utf-8',
                 errors='ignore',
                 bufsize=1,
-                universal_newlines=True
+                universal_newlines=True,
+                creationflags=SUBPROCESS_FLAGS
             )
 
             # Parse progress
@@ -378,7 +389,8 @@ class Converter:
                 text=True,
                 encoding='utf-8',
                 errors='ignore',
-                timeout=10
+                timeout=10,
+                creationflags=SUBPROCESS_FLAGS
             )
 
             if result.returncode == 0:
@@ -446,7 +458,8 @@ class Converter:
                 text=True,
                 encoding='utf-8',
                 errors='ignore',
-                timeout=3600  # 1 hour timeout
+                timeout=3600,  # 1 hour timeout
+                creationflags=SUBPROCESS_FLAGS
             )
 
             # Clean up list file
