@@ -2,24 +2,26 @@
 Main Window UI for M3U8 to MP4 Converter
 """
 
-import sys
-import os
-from pathlib import Path
-from PyQt5.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QPushButton, QLineEdit, QLabel, QProgressBar, QTextEdit,
-    QFileDialog, QGroupBox, QComboBox, QSplitter, QFrame,
-    QMessageBox, QStatusBar, QMenuBar, QMenu, QAction, QApplication
-)
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QUrl
-from PyQt5.QtGui import QDragEnterEvent, QDropEvent
 import asyncio
+import os
+import sys
 from datetime import datetime
+from pathlib import Path
+
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QUrl
+from PyQt5.QtGui import QDragEnterEvent, QDropEvent
+from PyQt5.QtWidgets import (
+    QApplication, QComboBox, QFileDialog, QFrame, QGridLayout,
+    QGroupBox, QHBoxLayout, QLabel, QMainWindow, QMenuBar, QMenu,
+    QMessageBox, QProgressBar, QPushButton, QSplitter, QStatusBar,
+    QTextEdit, QVBoxLayout, QWidget
+)
 
 # Add src directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from src.downloader import M3U8Downloader
+
 from src.converter import Converter
+from src.downloader import M3U8Downloader
 
 
 class ConversionWorker(QThread):

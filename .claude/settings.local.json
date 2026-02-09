@@ -27,7 +27,8 @@
       "Bash(.venv/Scripts/python.exe:*)",
       "Bash(cmd.exe:*)",
       "Bash(test:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(python:*)"
     ]
   }
 }

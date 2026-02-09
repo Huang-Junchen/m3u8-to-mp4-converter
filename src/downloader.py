@@ -6,13 +6,12 @@ Handles downloading M3U8 playlists and TS segments with AES-128 decryption suppo
 import os
 import re
 import asyncio
-import aiohttp
 from pathlib import Path
 from typing import Optional, List, Tuple, Callable
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
+
+import aiohttp
 from Crypto.Cipher import AES
-from Crypto.Util.Padding import unpad
-import base64
 
 
 class M3U8Downloader:

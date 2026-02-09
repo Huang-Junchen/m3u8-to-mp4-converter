@@ -2,12 +2,13 @@
 M3U8 to MP4 Converter - Main Entry Point
 """
 
-import sys
-import os
-from pathlib import Path
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import Qt
 import asyncio
+import os
+import sys
+from pathlib import Path
+
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication
 
 # Add project root to path
 project_root = Path(__file__).parent

@@ -4,26 +4,28 @@ Using PyQt-Fluent-Widgets library
 Based on PyQt-Fluent-Widgets examples best practices
 """
 
-import sys
+import asyncio
 import os
+import sys
+from datetime import datetime
 from pathlib import Path
+
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtGui import QDragEnterEvent, QDropEvent
-from PyQt5.QtWidgets import QApplication, QFileDialog, QWidget, QVBoxLayout, QHBoxLayout, QLabel
+from PyQt5.QtWidgets import QApplication, QFileDialog, QHBoxLayout, QLabel, QVBoxLayout, QWidget
+
 from qfluentwidgets import (
-    FluentWindow, NavigationItemPosition, FluentIcon as FIF,
-    PushButton, PrimaryPushButton, LineEdit, ProgressBar,
-    TextEdit, SubtitleLabel, StrongBodyLabel, BodyLabel,
-    InfoBar, InfoBarPosition, setTheme, Theme,
-    MessageBox, ScrollArea, HyperlinkLabel, CardWidget
+    BodyLabel, CardWidget, FluentIcon as FIF, FluentWindow,
+    HyperlinkLabel, InfoBar, InfoBarPosition, LineEdit, MessageBox,
+    NavigationItemPosition, PrimaryPushButton, ProgressBar, PushButton,
+    ScrollArea, setTheme, StrongBodyLabel, SubtitleLabel, TextEdit, Theme
 )
-import asyncio
-from datetime import datetime
 
 # Add src directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from src.downloader import M3U8Downloader
+
 from src.converter import Converter
+from src.downloader import M3U8Downloader
 
 
 class ConversionWorker(QThread):

@@ -2,9 +2,9 @@
 Unit tests for M3U8 to MP4 Converter
 """
 
+import sys
 import unittest
 from pathlib import Path
-import sys
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))

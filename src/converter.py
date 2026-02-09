@@ -4,11 +4,11 @@ Handles conversion of downloaded TS segments to MP4 using FFmpeg
 """
 
 import os
-import subprocess
-import shutil
-from pathlib import Path
-from typing import Optional, Callable, List
 import re
+import shutil
+import subprocess
+from pathlib import Path
+from typing import Callable, List, Optional
 
 
 class Converter:
