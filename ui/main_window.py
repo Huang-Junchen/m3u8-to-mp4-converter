@@ -237,7 +237,7 @@ class ConversionWorker(QThread):
             success = converter.convert_concat(
                 downloaded_files,
                 Path(self.output_path),
-                delete_segments=False  # Keep segments for debugging
+                delete_segments=False  # We'll delete the entire segments_dir folder manually
             )
 
             # Verify output file was created
@@ -245,6 +245,16 @@ class ConversionWorker(QThread):
             if success and output_path.exists():
                 file_size_mb = output_path.stat().st_size / (1024*1024)
                 self.log.emit(f"Conversion completed successfully! File size: {file_size_mb:.2f} MB", "INFO")
+
+                # Delete segments folder
+                if self.segments_dir.exists():
+                    try:
+                        import shutil
+                        shutil.rmtree(self.segments_dir)
+                        self.log.emit(f"Deleted segments folder: {self.segments_dir}", "INFO")
+                    except Exception as e:
+                        self.log.emit(f"Warning: Could not delete segments folder: {str(e)}", "WARNING")
+
                 self.finished.emit(True, "Conversion completed")
             elif success and not output_path.exists():
                 error_msg = f"Conversion reported success but output file not found at: {self.output_path}"
