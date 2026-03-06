@@ -18,6 +18,13 @@
 
 ### 安装依赖
 
+**推荐使用 uv（快速包管理器）：**
+```bash
+# 安装依赖
+uv sync
+```
+
+**或使用传统方式：**
 ```bash
 # 创建虚拟环境
 python -m venv .venv
@@ -53,6 +60,12 @@ sudo apt install ffmpeg
 
 ### 运行
 
+**使用 uv：**
+```bash
+uv run python main.py
+```
+
+**或传统方式：**
 ```bash
 python main.py
 ```
